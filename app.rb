@@ -80,6 +80,17 @@ class Tree
     end
   end
 
+  def level_order(node = root, queue = [], result = [])
+    result.push(node.data)
+    queue.push(node.left) unless node.left.nil?
+    queue.push(node.right) unless node.right.nil?
+    if queue.empty?
+      puts result.to_s
+      return
+    end
+
+    level_order(queue.shift, queue, result)
+  end
 end
 
 arr = [6, 2, 3, 7, 5, 1, 4]
@@ -91,4 +102,5 @@ bst.delete(0)
 bst.pretty_print
 bst.delete(4)
 bst.pretty_print
-p bst.find(3)
+bst.find(3)
+bst.level_order
