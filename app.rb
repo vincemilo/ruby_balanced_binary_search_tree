@@ -91,16 +91,107 @@ class Tree
 
     level_order(queue.shift, queue, result)
   end
+
+  def inorder(node = root)
+    # left root right
+    return if node.nil?
+
+    inorder(node.left)
+    print "#{node.data} "
+    inorder(node.right)
+  end
+
+  def preorder(node = root)
+    # root left right
+    return if node.nil?
+
+    print "#{node.data} "
+    preorder(node.left)
+    preorder(node.right)
+  end
+
+  def postorder(node = root)
+    # left right root
+    return if node.nil?
+
+    postorder(node.left)
+    postorder(node.right)
+    print "#{node.data} "
+  end
+
+  # height: number of edges from node to lowest leaf of its subtree
+
+  def height(node = root)
+    unless node.nil? || node == root
+      node = (node.instance_of?(Node) ? find(node.data) : find(node))
+    end
+    return -1 if node.nil?
+
+    [height(node.left), height(node.right)].max + 1
+  end
+
+  # depth: number of edges from root to given node
+
+  def depth(node = root, parent = root, edges = 0)
+    return 0 if node == parent
+    return -1 if node.nil?
+
+    if node < parent.data
+      edges += 1
+      depth(node, parent.left, edges)
+    elsif node > parent.data
+      edges += 1
+      depth(node, parent.right, edges)
+    else
+      edges
+    end
+  end
+
+  # balanced?: difference between height of left and right subtree not > 1
+
+  def balanced?(node = root)
+    return true if node.nil?
+
+    left_height = height(node.left)
+    right_height = height(node.right)
+
+    return true if (left_height - right_height).abs <= 1 && balanced?(node.left) && balanced?(node.right)
+
+    false
+  end
+
+  def rebalance
+    @data = ordered_array
+    @root = build_tree(data)
+  end
+
+  def ordered_array(node = root, arr = [])
+    unless node.nil?
+      ordered_array(node.left, arr)
+      arr.push(node.data)
+      ordered_array(node.right, arr)
+    end
+    arr
+  end
 end
 
-arr = [6, 2, 3, 7, 5, 1, 4]
+arr = Array.new(15) { rand(1..100) }
 bst = Tree.new(arr)
 bst.pretty_print
-bst.insert(0)
+bst.insert(101)
+bst.insert(3000)
+bst.insert(9999)
 bst.pretty_print
-bst.delete(0)
+puts 'Is the tree balanced?'
+p bst.balanced?
+puts 'Rebalancing...'
+bst.rebalance
+puts 'Is the tree balanced?'
+p bst.balanced?
 bst.pretty_print
-bst.delete(4)
-bst.pretty_print
-bst.find(3)
-bst.level_order
+puts 'Preorder'
+puts bst.preorder
+puts 'Inorder'
+puts bst.inorder
+puts 'Postorder'
+puts bst.postorder
